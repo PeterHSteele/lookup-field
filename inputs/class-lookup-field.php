@@ -55,7 +55,7 @@ class GfLookupField extends GF_Field_Text {
 				), esc_html__( 'Separate tags with commas', 'gravityforms' ), $form_id ) . '</p>';
 		}
 
-		$input = "<input name='input_{$id}' id='{$field_id}' type='{$html_input_type}' value='{$value}' class='{$class}' {$max_length} {$aria_describedby} {$tabindex} {$placeholder_attribute} {$required_attribute} {$invalid_attribute} {$disabled_text} {$autocomplete} data-url={$url} role='combobox' aria-controls='lookup-field-suggestions' aria-expanded='false' aria-haspopup='listbox'/> {$text_hint}";
+		$input = "<input name='input_{$id}' id='{$field_id}' type='{$html_input_type}' value='{$value}' class='{$class}' {$max_length} {$aria_describedby} {$tabindex} {$placeholder_attribute} {$required_attribute} {$invalid_attribute} {$disabled_text} {$autocomplete} data-url={$url}/> {$text_hint}";
 
 		return sprintf( "<div class='ginput_container ginput_container_text'>%s</div>", $input );
   }
@@ -101,7 +101,7 @@ class GfLookupField extends GF_Field_Text {
 
 		$description = $this->get_description( $this->description, 'gfield_description' );
 
-    $tooltip = "<div class='lf-tooltip'><ul id='lookup-field-suggestions' role='listbox'></ul></div>";
+    $tooltip = "<div class='lf-tooltip' role='presentation'><ul id='lookup-field-suggestions' role='listbox'></ul></div>";
 
 		if ( $this->is_description_above( $form ) ) {
 			$clear         = $is_admin ? "<div class='gf_clear'></div>" : '';
@@ -112,18 +112,4 @@ class GfLookupField extends GF_Field_Text {
 
 		return $field_content;
 	}
-
-  
-  function editor_script(){
-    ?>
-    <script type='text/javascript'>
-        //adding setting to fields of type "text"
-        fieldSettings.text += ", .encrypt_setting";
-        //binding to the load field settings event to initialize the checkbox
-        jQuery(document).on("gform_load_field_settings", function(event, field, form){
-            jQuery( '#field_encrypt_value' ).prop( 'checked', Boolean( rgar( field, 'encryptField' ) ) );
-        });
-    </script>
-    <?php
-  } 
 }

@@ -76,7 +76,7 @@ jQuery(document).ready(function(){
   
     async function getData( term, abortSignal ){
       const q = 'provider_type:( "physician/internal medicine" OR "family practice" OR physician OR "Physician/Pediatric Medicine OR rural health clinic")';
-      const url = `${apiUrl}?terms=${encodeURIComponent(term)}&maxList=9&q=${encodeURIComponent(q)}&df=name.full,addr_practice.full&sf=name.full`;//const url = apiUrl + '?terms=' + term + '&maxList=10',
+      const url = `${apiUrl}?terms=${encodeURIComponent(term)}&maxList=8&q=${encodeURIComponent(q)}&df=name.full,addr_practice.full&sf=name.full`;//const url = apiUrl + '?terms=' + term + '&maxList=10',
       response = await fetch( url, {signal: abortSignal} ),
       json = await response.json();
       return json;
@@ -111,22 +111,34 @@ jQuery(document).ready(function(){
 
     function openTooltip(){
       tooltip.classList.add('is-visible');
-      input.setAttribute('aria-expanded', 'true');
+      //input.setAttribute('aria-expanded', 'true');
     }
 
     function closeTooltip(){
       tooltip.classList.remove('is-visible');
-      input.setAttribute( 'aria-expanded', 'false' )
+      //input.setAttribute( 'aria-expanded', 'false' )
       focusedItem = null;
     }
 
-    function handleListClick( event ){
+    function handleListMouseDown( event ){
       const item = event.target.closest('.lf-listitem');
       if (item){
         const name = item.firstElementChild.textContent;
         input.value = name;
-        closeTooltip();
       }
+    }
+
+    function handleListClick( event ){
+      input.scrollIntoView();
+      closeTooltip()
+    }
+
+    function handleInputBlur(){
+      if (tooltip.classList.contains('is-visible')){
+        input.focus();
+        input.scrollIntoView();
+      }
+      closeTooltip();
     }
 
     function shiftFocus( whichSibling ){
@@ -145,10 +157,13 @@ jQuery(document).ready(function(){
         switch (event.key){
           case 'Enter':
             event.preventDefault();
-            const e = new MouseEvent('mousedown',{
-              bubbles: true
-            })
-            focusedItem && focusedItem.dispatchEvent(e);
+            const e = new MouseEvent('mousedown',{bubbles: true})
+            const c = new MouseEvent('click',{bubbles:true});
+            if (focusedItem){ 
+              const ref = focusedItem
+              ref.dispatchEvent(e);
+              ref.dispatchEvent(c);
+            }
             break;
           case 'ArrowDown':
             shiftFocus('nextElementSibling');
@@ -162,23 +177,10 @@ jQuery(document).ready(function(){
     }
 
     input.addEventListener('input',handleInput);
-    docList.addEventListener('mousedown',handleListClick);
-    input.addEventListener('blur',closeTooltip);
+    docList.addEventListener('mousedown',handleListMouseDown);
+    docList.addEventListener('click',handleListClick);
+    input.addEventListener('blur',handleInputBlur);
     input.addEventListener('keydown',handleKeyDown);
 
     })();
 });
-
-/*
-(a,b)=>{
-            const test = "Clinic or Group Practice",
-            vA = a[1],
-            vB = b[1]
-            if ( test != vA && test != vB || test == vA && test == vB ){ 
-              return 0; 
-            } else if ( test == vA ){
-              return 1;
-            } else {
-              return -1
-            }
-          } */
